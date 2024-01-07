@@ -18,12 +18,12 @@ remove_kM <- function(x){
 }
 
 #child mortality
-child_mortality <- read_csv("child_mortality_0_5.csv")
-child_mortality %<>% pivot_longer(-country,names_to="year",values_to="chmort")
+child_mortality <- read_csv("child_mortality_0_5.csv",show_col_types = FALSE)
+child_mortality %<>% pivot_longer(-country,names_to="year",values_to="child_mortality")
 child_mortality %<>% mutate(year = as.integer(year))
 
 #gdp and growth
-gdp <- read_csv("gdp_pcap.csv")
+gdp <- read_csv("gdp_pcap.csv",show_col_types = FALSE)
 gdp %<>% mutate(across(c(where(is.character),-country),~remove_kM(.)))
 gdp %<>% mutate(across(c(where(is.character),-country),~as.numeric(.)))
 gdp %<>% pivot_longer(-country,names_to="year",values_to="gdpPercap")
@@ -32,14 +32,14 @@ gdp %<>% group_by(country) %>% mutate(growth = (gdpPercap - lag(gdpPercap))/lag(
 gdp %<>% ungroup
 
 #population
-pop <- read_csv("pop.csv")
+pop <- read_csv("pop.csv",show_col_types = FALSE)
 pop %<>% mutate(across(c(where(is.character),-country),~remove_kM(.)))
 pop %<>% mutate(across(c(where(is.character),-country),~as.numeric(.)))
 pop %<>% pivot_longer(-country,names_to="year",values_to="pop")
 pop %<>% mutate(year = as.integer(year))
 
 #life expectancy
-lex <- read_csv("lex.csv")
+lex <- read_csv("lex.csv",show_col_types = FALSE)
 lex %<>% pivot_longer(-country,names_to="year",values_to="lifeExp")
 lex %<>% mutate(year = as.integer(year))
 
@@ -55,7 +55,11 @@ gapminder2 <- child_mortality %>%
               full_join(pop, by = join_by(country, year)) %>%
               full_join(lex, by = join_by(country, year))
 
-gapminder2 %<>% select(country,year,gdpPercap,pop,gdp,growth,lifeExp,chmort)
+gapminder2 %<>% mutate(gdp = gdpPercap*pop)
+gapminder2 %<>% mutate(country = if_else(country=="USA","United States",country))
+gapminder2 %<>% mutate(country = if_else(country=="UK","United Kingdom",country))
+
+gapminder2 %<>% select(country,year,gdpPercap,pop,gdp,growth,lifeExp,child_mortality)
 
 save_datasets(gapminder2)
 

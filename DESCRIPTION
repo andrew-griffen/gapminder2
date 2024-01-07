@@ -6,5 +6,7 @@ Authors@R:
 Description: Puts an updated version of the gapminder data from www.gapminder.org in a single package. Includes more years and countries compared to the CRAN gapminder package. I mainly plan to use for teaching and research but please use freely. The data api in www.gapminder.org is a bit unwieldy.
 License: MIT + file LICENSE
 Encoding: UTF-8
+LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+
